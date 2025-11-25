@@ -1,0 +1,87 @@
+// Выбор по вероятностям
+function weightedRandom(weights) {
+    let total = weights.reduce((s, w) => s + w.p, 0);
+    let r = Math.random() * total;
+    let c = 0;
+    for (let w of weights) {
+        c += w.p;
+        if (c >= r) return w.c;
+    }
+    return weights[weights.length - 1].c;
+}
+
+// Модель Шеннона
+function buildModel(text, order) {
+    let model = {};
+    for (let i = 0; i < text.length - order; i++) {
+        let key = text.substring(i, i + order);
+        let next = text[i + order];
+        if (!model[key]) model[key] = {};
+        if (!model[key][next]) model[key][next] = 0;
+        model[key][next]++;
+    }
+    return model;
+}
+
+// Генерация
+function generate(order, outputId) {
+    let text = document.getElementById("inputText").value;
+    let output = document.getElementById(outputId);
+
+    if (order > 0 && text.length < order + 1) {
+        output.value = "Недостаточно текста для модели " + order + "-го порядка";
+        return;
+    }
+
+    // 0-й порядок
+    if (order === 0) {
+        let freq = {};
+        for (let c of text) {
+            if (!freq[c]) freq[c] = 0;
+            freq[c]++;
+        }
+        let weights = [];
+        for (let c in freq) weights.push({c: c, p: freq[c]});
+        let res = "";
+        for (let i = 0; i < 1200; i++) res += weightedRandom(weights);
+
+        output.value = res;
+        updateStats(text);
+        return;
+    }
+
+    // 1-й и 3-й порядок
+    let model = buildModel(text, order);
+    let result = text.substring(0, order);
+    let current = result;
+
+    for (let i = 0; i < 1200; i++) {
+        let key = current.substring(current.length - order);
+        let next = model[key];
+        if (!next) break;
+
+        let weights = [];
+        for (let c in next) weights.push({c: c, p: next[c]});
+        let nextChar = weightedRandom(weights);
+
+        result += nextChar;
+        current += nextChar;
+    }
+
+    output.value = result;
+    updateStats(text);
+}
+
+// Статистика символов
+function updateStats(text) {
+    let stats = {};
+    for (let c of text) {
+        if (!stats[c]) stats[c] = 0;
+        stats[c]++;
+    }
+
+    let out = "";
+    for (let c in stats) out += `"${c}" повторяется ${stats[c]} раз<br>`;
+
+    document.getElementById("stats").innerHTML = out;
+}
