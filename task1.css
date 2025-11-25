@@ -1,0 +1,26 @@
+   body 
+   { font-family: Arial, sans-serif; 
+    max-width: 800px;
+     margin: 40px auto; 
+     line-height:1.5;
+      color:#222;
+       padding:0 15px; }
+    h1,h2 
+    {
+         color:#1b3a57; 
+    }
+    pre 
+    { background:#f5f7fa;
+         padding:12px;
+          border-radius:6px;
+           overflow:auto; }
+    .result 
+    { background:#eef9f1;
+         border-left:4px solid #38a169;
+          padding:12px;
+           border-radius:6px;
+            margin-top:10px; }
+    footer
+     { margin-top:30px; 
+        font-size:0.9em; 
+        color:#555; }
